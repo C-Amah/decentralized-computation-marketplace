@@ -21,3 +21,33 @@
 (define-constant TASK-DISPUTED u6)
 (define-constant TASK-CANCELED u7)
 
+;; Advanced Task Structure
+(define-map tasks
+  {task-id: uint}
+  {
+    creator: principal,
+    bounty: uint,
+    stake-requirement: uint,
+    description: (string-utf8 500),
+    computational-requirements: (string-utf8 200),
+    complexity-score: uint,
+    max-workers: uint,
+    state: uint,
+    assigned-workers: (list 5 principal),
+    result-submissions: (list 5 {
+      worker: principal,
+      result-hash: (buff 32),
+      submission-timestamp: uint,
+      stake: uint
+    }),
+    verification-threshold: uint,
+    challenge-period-end: uint,
+    privacy-level: uint,
+    resource-requirements: {
+      cpu-cores: uint,
+      ram-gb: uint,
+      storage-gb: uint,
+      gpu-requirement: bool
+    }
+  }
+)
