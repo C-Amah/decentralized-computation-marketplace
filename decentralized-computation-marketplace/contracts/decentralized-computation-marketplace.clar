@@ -11,4 +11,13 @@
 (define-constant ERR-STAKE-REQUIRED (err u106))
 (define-constant ERR-CHALLENGE-PERIOD-ACTIVE (err u107))
 
+;; Task States (Enhanced)
+(define-constant TASK-CREATED u0)
+(define-constant TASK-ASSIGNED u1)
+(define-constant TASK-SUBMITTED u2)
+(define-constant TASK-VERIFICATION-PERIOD u3)
+(define-constant TASK-COMPLETED u4)
+(define-constant TASK-VERIFIED u5)
+(define-constant TASK-DISPUTED u6)
+(define-constant TASK-CANCELED u7)
 
