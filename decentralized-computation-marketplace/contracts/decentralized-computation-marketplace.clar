@@ -85,3 +85,12 @@
     verification-stake: uint
   }
 )
+
+;; Skills and Certification Tracking
+(define-map worker-skills
+  principal
+  {
+    certified-skills: (list 10 (string-utf8 50)),
+    skill-levels: (list 10 uint)
+  }
+)
