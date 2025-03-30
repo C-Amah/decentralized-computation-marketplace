@@ -164,5 +164,18 @@
   )
 )
 
+;; Read-only functions for retrieving comprehensive information
+(define-read-only (get-task-details (task-id uint))
+  (map-get? tasks {task-id: task-id})
+)
+
+(define-read-only (get-worker-reputation (worker principal))
+  (map-get? worker-reputation worker)
+)
+
+(define-read-only (get-worker-skills (worker principal))
+  (map-get? worker-skills worker)
+)
+
 
 
