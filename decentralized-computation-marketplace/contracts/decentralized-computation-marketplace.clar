@@ -51,3 +51,37 @@
     }
   }
 )
+
+;; Enhanced Reputation System
+(define-map worker-reputation
+  principal
+  {
+    total-tasks-attempted: uint,
+    total-tasks-completed: uint,
+    successful-verifications: uint,
+    failed-tasks: uint,
+    disputes-raised: uint,
+    reputation-score: uint,
+    skill-tags: (list 10 (string-utf8 50)),
+    last-active-block: uint
+  }
+)
+
+;; Worker Stake Tracking
+(define-map worker-stakes
+  {task-id: uint, worker: principal}
+  {
+    stake-amount: uint,
+    stake-timestamp: uint
+  }
+)
+
+;; Task Verification Tracking
+(define-map task-verifications
+  {task-id: uint, verifier: principal}
+  {
+    verification-hash: (buff 32),
+    verification-timestamp: uint,
+    verification-stake: uint
+  }
+)
