@@ -94,3 +94,13 @@
     skill-levels: (list 10 uint)
   }
 )
+
+;; Dynamic Pricing Mechanism
+(define-map task-pricing
+  {task-id: uint}
+  {
+    base-price: uint,
+    dynamic-multiplier: uint,
+    price-adjusted-timestamp: uint
+  }
+)
