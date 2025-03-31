@@ -193,4 +193,18 @@
 (define-constant ERR-TASK-LIMIT-EXCEEDED (err u119))
 (define-constant ERR-NFT-REQUIRED (err u120))
 
+;; New task states
+(define-constant TASK-IN-ARBITRATION u8)
+(define-constant TASK-EXPIRED u9)
+
+;; Rating system
+(define-map worker-ratings
+  {task-id: uint, rater: principal, ratee: principal}
+  {
+    rating: uint,
+    comment: (string-utf8 200),
+    timestamp: uint
+  }
+)
+
 
