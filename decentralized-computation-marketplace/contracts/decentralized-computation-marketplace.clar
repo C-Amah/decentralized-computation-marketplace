@@ -283,3 +283,14 @@
   }
 )
 
+;; Arbiters registry
+(define-map arbiters
+  principal
+  {
+    cases-handled: uint,
+    success-rate: uint,
+    specialty: (string-utf8 50),
+    active: bool,
+    stake: uint
+  }
+)
