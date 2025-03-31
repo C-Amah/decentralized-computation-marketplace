@@ -616,3 +616,33 @@
     (ok proposal-id)
   )
 )
+
+;; Function to vote on governance proposal
+(define-public (vote-on-proposal
+  (proposal-id uint)
+  (vote-for bool)
+)
+  (let 
+    ((proposal (unwrap! (map-get? governance-proposals {proposal-id: proposal-id}) ERR-UNAUTHORIZED))
+     (reputation (default-to 
+        {reputation-score: u0} 
+        (map-get? worker-reputation tx-sender)))
+     (reputation-score (get reputation-score reputation))
+     (voting-power (/ reputation-score u10))
+    )
+    
+    ;; Verify voting deadline not passed
+    (asserts! (< stacks-block-height (get voting-deadline proposal)) ERR-DEADLINE-PASSED)
+    
+    ;; Update vote counts
+    (map-set governance-proposals
+      {proposal-id: proposal-id}
+      (merge proposal {
+        votes-for: (if vote-for (+ (get votes-for proposal) voting-power) (get votes-for proposal)),
+        votes-against: (if vote-for (get votes-against proposal) (+ (get votes-against proposal) voting-power))
+      })
+    )
+    
+    (ok true)
+  )
+)
