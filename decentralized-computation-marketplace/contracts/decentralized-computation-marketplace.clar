@@ -418,3 +418,16 @@
     })
   }
 )
+
+;; Map to track task recommendations
+(define-map task-recommendations
+  principal
+  {
+    recommended-tasks: (list 10 uint),
+    recommendation-reason: (list 10 (string-utf8 100)),
+    recommendation-score: (list 10 uint),
+    last-updated: uint
+  }
+)
+
+
