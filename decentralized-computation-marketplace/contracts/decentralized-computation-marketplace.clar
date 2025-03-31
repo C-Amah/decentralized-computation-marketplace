@@ -646,3 +646,35 @@
     (ok true)
   )
 )
+
+;; Function to execute passed proposal
+(define-public (execute-proposal
+  (proposal-id uint)
+  (execution-data (buff 32))
+)
+  (let 
+    ((proposal (unwrap! (map-get? governance-proposals {proposal-id: proposal-id}) ERR-UNAUTHORIZED))
+     (votes-for (get votes-for proposal))
+     (votes-against (get votes-against proposal))
+     (passed (> votes-for votes-against))
+    )
+    
+    ;; Verify voting deadline passed
+    (asserts! (> stacks-block-height (get voting-deadline proposal)) ERR-CHALLENGE-PERIOD-ACTIVE)
+    
+    ;; Verify proposal passed
+    (asserts! passed ERR-UNAUTHORIZED)
+    
+    ;; Update proposal status
+    (map-set governance-proposals
+      {proposal-id: proposal-id}
+      (merge proposal {
+        status: u1,
+        executed: true,
+        execution-data: (some execution-data)
+      })
+    )
+    
+    (ok true)
+  )
+)
