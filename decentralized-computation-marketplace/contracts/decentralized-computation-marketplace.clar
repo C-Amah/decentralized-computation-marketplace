@@ -360,3 +360,15 @@
     })
   }
 )
+
+;; Map to track certification authorities
+(define-map certification-authorities
+  principal
+  {
+    authority-name: (string-utf8 100),
+    domains: (list 10 (string-utf8 50)),
+    authority-reputation: uint,
+    registered-at: uint,
+    authority-stake: uint
+  }
+)
