@@ -313,3 +313,29 @@
     })
   }
 )
+
+;; Map to track collaboration on tasks
+(define-map task-collaboration
+  {task-id: uint}
+  {
+    communication-logs: (list 50 {
+      sender: principal,
+      timestamp: uint,
+      message-hash: (buff 32),
+      encrypted: bool
+    }),
+    shared-resources: (list 20 {
+      name: (string-utf8 100),
+      resource-hash: (buff 32),
+      uploader: principal,
+      upload-timestamp: uint,
+      access-control: (list 10 principal)
+    }),
+    revision-history: (list 10 {
+      version: uint,
+      changes: (string-utf8 200),
+      author: principal,
+      timestamp: uint
+    })
+  }
+)
