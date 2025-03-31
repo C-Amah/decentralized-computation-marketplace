@@ -726,3 +726,67 @@
     last-updated: uint
   }
 )
+
+;; Function to update task analytics
+(define-public (update-task-analytics
+  (task-id uint)
+)
+  (let 
+    ((task (unwrap! (map-get? tasks {task-id: task-id}) ERR-TASK-NOT-FOUND))
+     (current-analytics (default-to 
+        {
+          time-metrics: {
+            creation-time: u0,
+            assignment-time: u0,
+            submission-time: u0,
+            verification-time: u0,
+            completion-time: u0,
+            total-duration: u0
+          },
+          worker-metrics: {
+            assigned-count: u0,
+            submission-count: u0,
+            average-reputation: u0,
+            worker-diversity-score: u0
+          },
+          financial-metrics: {
+            total-bounty-paid: u0,
+            total-stake-locked: u0,
+            cost-per-computation: u0,
+            value-delivery-ratio: u0
+          },
+          quality-metrics: {
+            verification-success-rate: u0,
+            dispute-count: u0,
+            consensus-score: u0,
+            result-confidence: u0
+          }
+        }
+        (map-get? task-analytics {task-id: task-id})))
+    )
+    
+    ;; Update analytics
+    (map-set task-analytics
+      {task-id: task-id}
+      (merge current-analytics {
+        time-metrics: {
+          creation-time: u0,  ;; Would use actual timestamps in real implementation
+          assignment-time: u0,
+          submission-time: u0,
+          verification-time: u0,
+          completion-time: stacks-block-height,
+          total-duration: stacks-block-height
+        },
+        worker-metrics: {
+          assigned-count: (len (get assigned-workers task)),
+          submission-count: (len (get result-submissions task)),
+          average-reputation: u0,  ;; Would calculate in real implementation
+          worker-diversity-score: u0
+        }
+      })
+    )
+    
+    (ok true)
+  )
+)
+
