@@ -544,3 +544,20 @@
     (ok true)
   )
 )
+
+;; Map to track governance proposals
+(define-map governance-proposals
+  {proposal-id: uint}
+  {
+    proposer: principal,
+    proposal-type: uint,  ;; 0=parameter, 1=feature, 2=rule
+    proposal-description: (string-utf8 500),
+    proposal-data: (buff 32),
+    votes-for: uint,
+    votes-against: uint,
+    voting-deadline: uint,
+    status: uint,  ;; 0=active, 1=passed, 2=rejected
+    executed: bool,
+    execution-data: (optional (buff 32))
+  }
+)
