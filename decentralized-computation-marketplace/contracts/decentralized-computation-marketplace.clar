@@ -262,4 +262,24 @@
   }
 )
 
+;; Template counter
+(define-data-var template-id-counter uint u0)
+
+;; Dispute data
+(define-map disputes
+  {task-id: uint}
+  {
+    initiator: principal,
+    respondent: principal,
+    evidence-hash: (buff 32),
+    arbiter: (optional principal),
+    status: uint,
+    created-at: uint,
+    resolution: (optional {
+      winner: principal,
+      resolution-note: (string-utf8 200),
+      bounty-distribution: (list 5 {recipient: principal, amount: uint})
+    })
+  }
+)
 
