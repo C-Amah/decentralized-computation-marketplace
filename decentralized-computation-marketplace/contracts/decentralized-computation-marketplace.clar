@@ -711,3 +711,18 @@
     }
   }
 )
+
+;; Map to track network analytics
+(define-map network-analytics
+  {period: uint}  ;; 0=daily, 1=weekly, 2=monthly
+  {
+    active-tasks: uint,
+    active-workers: uint,
+    total-bounty-flow: uint,
+    total-stake-locked: uint,
+    average-task-complexity: uint,
+    dispute-resolution-rate: uint,
+    network-growth-rate: uint,
+    last-updated: uint
+  }
+)
