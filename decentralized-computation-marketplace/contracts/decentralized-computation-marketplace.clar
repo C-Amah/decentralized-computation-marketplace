@@ -575,3 +575,44 @@
     modified-by: principal
   }
 )
+
+;; Function to create governance proposal
+(define-public (create-governance-proposal
+  (proposal-type uint)
+  (proposal-description (string-utf8 500))
+  (proposal-data (buff 32))
+  (voting-deadline uint)
+)
+  (let 
+    ((proposal-id (var-get proposal-id-counter))
+     (reputation (default-to 
+        {reputation-score: u0} 
+        (map-get? worker-reputation tx-sender)))
+    )
+    
+    ;; Verify caller has sufficient reputation
+    (asserts! (>= (get reputation-score reputation) u100) ERR-INSUFFICIENT-REPUTATION)
+    
+    ;; Create proposal
+    (map-set governance-proposals
+      {proposal-id: proposal-id}
+      {
+        proposer: tx-sender,
+        proposal-type: proposal-type,
+        proposal-description: proposal-description,
+        proposal-data: proposal-data,
+        votes-for: u0,
+        votes-against: u0,
+        voting-deadline: voting-deadline,
+        status: u0,
+        executed: false,
+        execution-data: none
+      }
+    )
+    
+    ;; Increment proposal counter
+    (var-set proposal-id-counter (+ proposal-id u1))
+    
+    (ok proposal-id)
+  )
+)
