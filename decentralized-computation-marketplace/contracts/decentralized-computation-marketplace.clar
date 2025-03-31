@@ -178,4 +178,19 @@
 )
 
 
+(define-constant ERR-MAX-WORKERS-REACHED (err u108))
+(define-constant ERR-ALREADY-ASSIGNED (err u109))
+(define-constant ERR-NOT-ASSIGNED-WORKER (err u110))
+(define-constant ERR-PAYMENT-FAILED (err u111))
+(define-constant ERR-DEADLINE-PASSED (err u112))
+(define-constant ERR-EMPTY-DESCRIPTION (err u113))
+
+(define-constant ERR-INVALID-RATING (err u114))
+(define-constant ERR-ALREADY-RATED (err u115))
+(define-constant ERR-INACTIVE-MARKET (err u116))
+(define-constant ERR-INVALID-ESCROW (err u117))
+(define-constant ERR-BLACKLISTED (err u118))
+(define-constant ERR-TASK-LIMIT-EXCEEDED (err u119))
+(define-constant ERR-NFT-REQUIRED (err u120))
+
 
