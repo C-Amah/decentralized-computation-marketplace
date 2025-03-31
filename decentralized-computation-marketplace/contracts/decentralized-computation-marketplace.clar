@@ -398,3 +398,23 @@
     (ok true)
   )
 )
+
+;; Map to track task marketplace data
+(define-map task-marketplace
+  {task-id: uint}
+  {
+    tags: (list 10 (string-utf8 50)),
+    visibility: uint,  ;; 0=private, 1=public, 2=invite-only
+    listing-expiry: uint,
+    promoted: bool,
+    promotion-cost: uint,
+    views: uint,
+    applications: (list 20 {
+      applicant: principal,
+      application-text: (string-utf8 200),
+      proposed-price: uint,
+      proposed-timeframe: uint,
+      status: uint  ;; 0=pending, 1=accepted, 2=rejected
+    })
+  }
+)
