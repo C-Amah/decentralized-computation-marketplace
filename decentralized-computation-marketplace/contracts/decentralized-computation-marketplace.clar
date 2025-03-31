@@ -493,3 +493,28 @@
   )
 )
 
+;; Function to trigger automated task execution
+(define-public (trigger-automated-execution
+  (task-id uint)
+  (execution-proof (buff 32))
+)
+  (let 
+    ((task (unwrap! (map-get? tasks {task-id: task-id}) ERR-TASK-NOT-FOUND))
+     (automation (unwrap! (map-get? automated-task-execution {task-id: task-id}) ERR-UNAUTHORIZED))
+    )
+    
+    ;; Update automation status
+    (map-set automated-task-execution
+      {task-id: task-id}
+      (merge automation {status: u1})
+    )
+    
+    ;; Update task state
+    (map-set tasks
+      {task-id: task-id}
+      (merge task {state: TASK-ASSIGNED})
+    )
+    
+    (ok true)
+  )
+)
