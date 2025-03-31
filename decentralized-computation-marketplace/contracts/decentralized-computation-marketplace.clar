@@ -843,3 +843,12 @@
   )
 )
 
+;; Read-only function to get task analytics
+(define-read-only (get-task-analytics (task-id uint))
+  (map-get? task-analytics {task-id: task-id})
+)
+
+;; Read-only function to get network analytics
+(define-read-only (get-network-analytics (period uint))
+  (map-get? network-analytics {period: period})
+)
