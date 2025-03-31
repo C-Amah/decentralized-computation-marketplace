@@ -828,3 +828,18 @@
   )
 )
 
+;; Function to generate task report
+(define-public (generate-task-report
+  (task-id uint)
+)
+  (let 
+    ((task (unwrap! (map-get? tasks {task-id: task-id}) ERR-TASK-NOT-FOUND))
+     (analytics (unwrap! (map-get? task-analytics {task-id: task-id}) ERR-UNAUTHORIZED))
+    )
+    
+    ;; Would generate report in real implementation
+    
+    (ok true)
+  )
+)
+
