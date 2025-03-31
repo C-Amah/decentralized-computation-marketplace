@@ -790,3 +790,41 @@
   )
 )
 
+;; Function to generate network analytics
+(define-public (generate-network-analytics
+  (period uint)
+)
+  (let 
+    ((analytics (default-to 
+        {
+          active-tasks: u0,
+          active-workers: u0,
+          total-bounty-flow: u0,
+          total-stake-locked: u0,
+          average-task-complexity: u0,
+          dispute-resolution-rate: u0,
+          network-growth-rate: u0,
+          last-updated: u0
+        }
+        (map-get? network-analytics {period: period})))
+    )
+    
+    ;; Update analytics
+    (map-set network-analytics
+      {period: period}
+      (merge analytics {
+        active-tasks: u0,  ;; Would calculate in real implementation
+        active-workers: u0,
+        total-bounty-flow: u0,
+        total-stake-locked: u0,
+        average-task-complexity: u0,
+        dispute-resolution-rate: u0,
+        network-growth-rate: u0,
+        last-updated: stacks-block-height
+      })
+    )
+    
+    (ok true)
+  )
+)
+
