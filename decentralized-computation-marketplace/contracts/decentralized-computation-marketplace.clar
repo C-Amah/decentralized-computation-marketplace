@@ -678,3 +678,36 @@
     (ok true)
   )
 )
+
+;; Map to track task analytics
+(define-map task-analytics
+  {task-id: uint}
+  {
+    time-metrics: {
+      creation-time: uint,
+      assignment-time: uint,
+      submission-time: uint,
+      verification-time: uint,
+      completion-time: uint,
+      total-duration: uint
+    },
+    worker-metrics: {
+      assigned-count: uint,
+      submission-count: uint,
+      average-reputation: uint,
+      worker-diversity-score: uint
+    },
+    financial-metrics: {
+      total-bounty-paid: uint,
+      total-stake-locked: uint,
+      cost-per-computation: uint,
+      value-delivery-ratio: uint
+    },
+    quality-metrics: {
+      verification-success-rate: uint,
+      dispute-count: uint,
+      consensus-score: uint,
+      result-confidence: uint
+    }
+  }
+)
