@@ -339,3 +339,24 @@
     })
   }
 )
+
+;; Map to track worker certifications
+(define-map worker-certifications
+  principal
+  {
+    certificates: (list 10 {
+      certification-name: (string-utf8 100),
+      issuer: principal,
+      issue-date: uint,
+      expiry-date: uint,
+      certification-hash: (buff 32),
+      revoked: bool
+    }),
+    specializations: (list 5 {
+      domain: (string-utf8 50),
+      expertise-level: uint,
+      years-experience: uint,
+      endorsements: (list 10 principal)
+    })
+  }
+)
