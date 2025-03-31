@@ -561,3 +561,17 @@
     execution-data: (optional (buff 32))
   }
 )
+
+;; Counter for governance proposals
+(define-data-var proposal-id-counter uint u0)
+
+;; Task governance parameters
+(define-map governance-parameters
+  (string-utf8 50)
+  {
+    value: uint,
+    description: (string-utf8 200),
+    last-modified: uint,
+    modified-by: principal
+  }
+)
