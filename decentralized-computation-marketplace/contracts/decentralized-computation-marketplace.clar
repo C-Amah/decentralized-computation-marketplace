@@ -207,4 +207,24 @@
   }
 )
 
+;; Worker blacklist
+(define-map blacklisted-workers
+  principal
+  {
+    blacklisted-at: uint,
+    reason: (string-utf8 200),
+    blacklisted-by: principal
+  }
+)
+
+;; Task categories and subcategories
+(define-map task-categories
+  (string-utf8 50)
+  {
+    subcategories: (list 10 (string-utf8 50)),
+    active: bool,
+    minimum-reputation: uint
+  }
+)
+
 
