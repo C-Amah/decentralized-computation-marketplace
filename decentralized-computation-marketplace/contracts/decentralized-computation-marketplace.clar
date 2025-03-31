@@ -561,3 +561,294 @@
     execution-data: (optional (buff 32))
   }
 )
+
+;; Counter for governance proposals
+(define-data-var proposal-id-counter uint u0)
+
+;; Task governance parameters
+(define-map governance-parameters
+  (string-utf8 50)
+  {
+    value: uint,
+    description: (string-utf8 200),
+    last-modified: uint,
+    modified-by: principal
+  }
+)
+
+;; Function to create governance proposal
+(define-public (create-governance-proposal
+  (proposal-type uint)
+  (proposal-description (string-utf8 500))
+  (proposal-data (buff 32))
+  (voting-deadline uint)
+)
+  (let 
+    ((proposal-id (var-get proposal-id-counter))
+     (reputation (default-to 
+        {reputation-score: u0} 
+        (map-get? worker-reputation tx-sender)))
+    )
+    
+    ;; Verify caller has sufficient reputation
+    (asserts! (>= (get reputation-score reputation) u100) ERR-INSUFFICIENT-REPUTATION)
+    
+    ;; Create proposal
+    (map-set governance-proposals
+      {proposal-id: proposal-id}
+      {
+        proposer: tx-sender,
+        proposal-type: proposal-type,
+        proposal-description: proposal-description,
+        proposal-data: proposal-data,
+        votes-for: u0,
+        votes-against: u0,
+        voting-deadline: voting-deadline,
+        status: u0,
+        executed: false,
+        execution-data: none
+      }
+    )
+    
+    ;; Increment proposal counter
+    (var-set proposal-id-counter (+ proposal-id u1))
+    
+    (ok proposal-id)
+  )
+)
+
+;; Function to vote on governance proposal
+(define-public (vote-on-proposal
+  (proposal-id uint)
+  (vote-for bool)
+)
+  (let 
+    ((proposal (unwrap! (map-get? governance-proposals {proposal-id: proposal-id}) ERR-UNAUTHORIZED))
+     (reputation (default-to 
+        {reputation-score: u0} 
+        (map-get? worker-reputation tx-sender)))
+     (reputation-score (get reputation-score reputation))
+     (voting-power (/ reputation-score u10))
+    )
+    
+    ;; Verify voting deadline not passed
+    (asserts! (< stacks-block-height (get voting-deadline proposal)) ERR-DEADLINE-PASSED)
+    
+    ;; Update vote counts
+    (map-set governance-proposals
+      {proposal-id: proposal-id}
+      (merge proposal {
+        votes-for: (if vote-for (+ (get votes-for proposal) voting-power) (get votes-for proposal)),
+        votes-against: (if vote-for (get votes-against proposal) (+ (get votes-against proposal) voting-power))
+      })
+    )
+    
+    (ok true)
+  )
+)
+
+;; Function to execute passed proposal
+(define-public (execute-proposal
+  (proposal-id uint)
+  (execution-data (buff 32))
+)
+  (let 
+    ((proposal (unwrap! (map-get? governance-proposals {proposal-id: proposal-id}) ERR-UNAUTHORIZED))
+     (votes-for (get votes-for proposal))
+     (votes-against (get votes-against proposal))
+     (passed (> votes-for votes-against))
+    )
+    
+    ;; Verify voting deadline passed
+    (asserts! (> stacks-block-height (get voting-deadline proposal)) ERR-CHALLENGE-PERIOD-ACTIVE)
+    
+    ;; Verify proposal passed
+    (asserts! passed ERR-UNAUTHORIZED)
+    
+    ;; Update proposal status
+    (map-set governance-proposals
+      {proposal-id: proposal-id}
+      (merge proposal {
+        status: u1,
+        executed: true,
+        execution-data: (some execution-data)
+      })
+    )
+    
+    (ok true)
+  )
+)
+
+;; Map to track task analytics
+(define-map task-analytics
+  {task-id: uint}
+  {
+    time-metrics: {
+      creation-time: uint,
+      assignment-time: uint,
+      submission-time: uint,
+      verification-time: uint,
+      completion-time: uint,
+      total-duration: uint
+    },
+    worker-metrics: {
+      assigned-count: uint,
+      submission-count: uint,
+      average-reputation: uint,
+      worker-diversity-score: uint
+    },
+    financial-metrics: {
+      total-bounty-paid: uint,
+      total-stake-locked: uint,
+      cost-per-computation: uint,
+      value-delivery-ratio: uint
+    },
+    quality-metrics: {
+      verification-success-rate: uint,
+      dispute-count: uint,
+      consensus-score: uint,
+      result-confidence: uint
+    }
+  }
+)
+
+;; Map to track network analytics
+(define-map network-analytics
+  {period: uint}  ;; 0=daily, 1=weekly, 2=monthly
+  {
+    active-tasks: uint,
+    active-workers: uint,
+    total-bounty-flow: uint,
+    total-stake-locked: uint,
+    average-task-complexity: uint,
+    dispute-resolution-rate: uint,
+    network-growth-rate: uint,
+    last-updated: uint
+  }
+)
+
+;; Function to update task analytics
+(define-public (update-task-analytics
+  (task-id uint)
+)
+  (let 
+    ((task (unwrap! (map-get? tasks {task-id: task-id}) ERR-TASK-NOT-FOUND))
+     (current-analytics (default-to 
+        {
+          time-metrics: {
+            creation-time: u0,
+            assignment-time: u0,
+            submission-time: u0,
+            verification-time: u0,
+            completion-time: u0,
+            total-duration: u0
+          },
+          worker-metrics: {
+            assigned-count: u0,
+            submission-count: u0,
+            average-reputation: u0,
+            worker-diversity-score: u0
+          },
+          financial-metrics: {
+            total-bounty-paid: u0,
+            total-stake-locked: u0,
+            cost-per-computation: u0,
+            value-delivery-ratio: u0
+          },
+          quality-metrics: {
+            verification-success-rate: u0,
+            dispute-count: u0,
+            consensus-score: u0,
+            result-confidence: u0
+          }
+        }
+        (map-get? task-analytics {task-id: task-id})))
+    )
+    
+    ;; Update analytics
+    (map-set task-analytics
+      {task-id: task-id}
+      (merge current-analytics {
+        time-metrics: {
+          creation-time: u0,  ;; Would use actual timestamps in real implementation
+          assignment-time: u0,
+          submission-time: u0,
+          verification-time: u0,
+          completion-time: stacks-block-height,
+          total-duration: stacks-block-height
+        },
+        worker-metrics: {
+          assigned-count: (len (get assigned-workers task)),
+          submission-count: (len (get result-submissions task)),
+          average-reputation: u0,  ;; Would calculate in real implementation
+          worker-diversity-score: u0
+        }
+      })
+    )
+    
+    (ok true)
+  )
+)
+
+;; Function to generate network analytics
+(define-public (generate-network-analytics
+  (period uint)
+)
+  (let 
+    ((analytics (default-to 
+        {
+          active-tasks: u0,
+          active-workers: u0,
+          total-bounty-flow: u0,
+          total-stake-locked: u0,
+          average-task-complexity: u0,
+          dispute-resolution-rate: u0,
+          network-growth-rate: u0,
+          last-updated: u0
+        }
+        (map-get? network-analytics {period: period})))
+    )
+    
+    ;; Update analytics
+    (map-set network-analytics
+      {period: period}
+      (merge analytics {
+        active-tasks: u0,  ;; Would calculate in real implementation
+        active-workers: u0,
+        total-bounty-flow: u0,
+        total-stake-locked: u0,
+        average-task-complexity: u0,
+        dispute-resolution-rate: u0,
+        network-growth-rate: u0,
+        last-updated: stacks-block-height
+      })
+    )
+    
+    (ok true)
+  )
+)
+
+;; Function to generate task report
+(define-public (generate-task-report
+  (task-id uint)
+)
+  (let 
+    ((task (unwrap! (map-get? tasks {task-id: task-id}) ERR-TASK-NOT-FOUND))
+     (analytics (unwrap! (map-get? task-analytics {task-id: task-id}) ERR-UNAUTHORIZED))
+    )
+    
+    ;; Would generate report in real implementation
+    
+    (ok true)
+  )
+)
+
+;; Read-only function to get task analytics
+(define-read-only (get-task-analytics (task-id uint))
+  (map-get? task-analytics {task-id: task-id})
+)
+
+;; Read-only function to get network analytics
+(define-read-only (get-network-analytics (period uint))
+  (map-get? network-analytics {period: period})
+)
